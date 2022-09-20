@@ -21,15 +21,12 @@ void MessageQueue<T>::send(T &&msg)
     _cond.notify_one();
 }
 
-/* Implementation of class "TrafficLight" */
-
-/* 
+/* Implementation of class "TrafficLight" */ 
 TrafficLight::TrafficLight()
 {
     _currentPhase = TrafficLightPhase::red;
 }
 
-*/
 void TrafficLight::waitForGreen()
 {
     while (true) {
