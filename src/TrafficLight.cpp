@@ -9,7 +9,7 @@ T MessageQueue<T>::receive()
 {
     std::unique_lock<std::mutex> uLock(_mtx);
     _cond.wait(uLock,[this]{return _queue.size() > 0;});
-    return std::move(_queue.pop_front());
+    return std::move(_queue.front());
 }
 
 template <typename T>
@@ -32,9 +32,11 @@ TrafficLight::TrafficLight()
 */
 void TrafficLight::waitForGreen()
 {
-    // FP.5b : add the implementation of the method waitForGreen, in which an infinite while-loop 
-    // runs and repeatedly calls the receive function on the message queue. 
-    // Once it receives TrafficLightPhase::green, the method returns.
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        _currentPhase = _trafficLightQueue.receive();
+        if (_currentPhase == TrafficLightPhase::green) {return;};
+    }
 }
 
 TrafficLightPhase TrafficLight::getCurrentPhase()
