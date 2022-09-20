@@ -17,8 +17,10 @@ T MessageQueue<T>::receive()
 template <typename T>
 void MessageQueue<T>::send(T &&msg)
 {
-    // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex> 
-    // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
+    std::lock_guard<std::mutex> lock(_mtx);
+    _queue.clear();
+    _queue.emplace_back(msg);
+    _cond.notify_one();
 }
 
 /* Implementation of class "TrafficLight" */
@@ -77,7 +79,7 @@ void TrafficLight::cycleThroughPhases()
             }
 
             // Send update message to queue
-            _messageQueue.send(std::move(_currentPhase));
+            _trafficLightQueue.send(std::move(_currentPhase));
 
             // Reset the loop start time to compute the next waitDuration
             loopStartTime = std::chrono::high_resolution_clock::now();
